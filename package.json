@@ -11,7 +11,7 @@
     "@liveblocks/client": "^2.4.0",
     "@liveblocks/node": "^2.4.0",
     "@liveblocks/react": "^2.4.0",
-    "next": "15.3.0",
+    "next": "15.3.8",
     "react": "^19",
     "react-dom": "^19",
     "uuid": "^10.0.0"
