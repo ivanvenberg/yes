@@ -37,7 +37,6 @@ const INITIAL_GAME = {
 };
 
 function GameRoom({ playerId, playerName, isHost }: { playerId: string; playerName: string; isHost: boolean }) {
-  // useStorage: root.game is a plain readonly object — use dot access
   const phase = useStorage((root) => root.game.phase);
 
   const joinGame = useMutation(({ storage }) => {
@@ -51,7 +50,23 @@ function GameRoom({ playerId, playerName, isHost }: { playerId: string; playerNa
     }
   }, [playerId, playerName, isHost]);
 
-  useEffect(() => { joinGame(); }, [joinGame]);
+  // Wait for storage to load before running mutation
+  useEffect(() => {
+    if (phase === undefined || phase === null) return;
+    joinGame();
+  }, [joinGame, phase]);
+
+  // Storage not ready yet
+  if (phase === undefined || phase === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-950">
+        <div className="text-center">
+          <div className="text-5xl mb-4 animate-spin">⚔️</div>
+          <p className="text-gray-400">Connecting to battle...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (phase === "lobby" || phase === "hero-select") return <Lobby playerId={playerId} isHost={isHost} />;
   if (phase === "results") return <Results playerId={playerId} />;
@@ -78,7 +93,10 @@ export default function RoomPage() {
 
   if (!ready) return (
     <div className="min-h-screen flex items-center justify-center bg-gray-950">
-      <div className="text-center"><div className="text-5xl mb-4 animate-spin">⚔️</div><p className="text-gray-400">Loading...</p></div>
+      <div className="text-center">
+        <div className="text-5xl mb-4 animate-spin">⚔️</div>
+        <p className="text-gray-400">Loading...</p>
+      </div>
     </div>
   );
 
